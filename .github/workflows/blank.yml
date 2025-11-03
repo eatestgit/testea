@@ -68,7 +68,7 @@ jobs:
           Write-Error $_.Exception.Message;
         }
     - name: Upload Zipped Tenant
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2
       with:
         name: Tenant
         path: "tenant.zip"
