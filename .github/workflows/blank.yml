@@ -10,7 +10,7 @@ jobs:
     runs-on: [windows-latest]
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Import Tenant
       env: 
         ClientId: b1ca132b-42c4-4b5e-be9a-e7e0169aaa1a
