@@ -1,0 +1,74 @@
+# This is the Loome Integrate Git Integration Workflow file
+name: CI
+# Controls when the action will run. Triggers the workflow on pushes to master
+on:
+  push:
+    branches: [ main ]
+jobs:
+  build:
+    # The type of runner that the job will run on in this case windows:
+    runs-on: [windows-latest]
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+    - name: Import Tenant
+      env: 
+        ClientId: b1ca132b-42c4-4b5e-be9a-e7e0169aaa1a
+        IdHostName: https://dev-id.loomesoftware.com
+        ApiHostName: https://dev-integrate-api.loomesoftware.com
+        AgentHostName: DESKTOP-7VCQDM7	
+      shell: pwsh
+      run: |
+        try {
+        Add-Type -AssemblyName System.IO.Compression.FileSystem
+        $ClientId = $env:ClientId;
+        $IdHostName= $env:IdHostName;
+            
+        $TokenRequestBody = @{
+            "grant_type"    = "client_credentials";
+            "client_id"     = $ClientId;
+            "client_secret" = $ClientId;
+            "scope"         = "webApi"
+        };
+        $AccessToken = ((Invoke-WebRequest -Uri "https://$IdHostName/connect/token" -Method Post -Body $TokenRequestBody).Content | ConvertFrom-Json).access_token;
+            
+        $ArtifactOutputDir = $ENV:GITHUB_WORKSPACE;
+        $ApiHostName = $env:ApiHost;
+        $BaseUrl = "https://$env:ApiHostName/api/v1/";
+        $AgentHostname = $env:AgentHostName;
+            
+        function Upload-Zip ($ZipLocation) {
+            $AccessHeaders = @{"Authorization" = "bearer $AccessToken" }
+            
+            $ZipUploadUrl = $BaseUrl + "Import/Zip?agentHostName=$AgentHostName";
+            
+            try {
+                $Response = Invoke-RestMethod $ZipUploadUrl -Method 'POST' -Headers $AccessHeaders -InFile $ZipLocation -ContentType "application/zip" -SkipHttpErrorCheck;            
+            }
+            catch {
+              throw "an unexpected error occurred";
+            }
+
+            $ResponseMessage = $Response | Out-String;
+            
+            if ($ResponseMessage.Contains("Import failed"))
+            {
+              throw $ResponseMessage;
+            }
+                
+        }
+        
+        $ZipPath = "tenant.zip";
+        Remove-Item $ZipPath -ErrorAction Ignore;
+        Compress-Archive -Path $ArtifactOutputDir -DestinationPath $ZipPath;
+        Upload-Zip -ZipLocation $ZipPath;
+        }
+        catch {
+          Write-Output "Failed Run";
+          Write-Error $_.Exception.Message;
+        }
+    - name: Upload Zipped Tenant
+      uses: actions/upload-artifact@v1
+      with:
+        name: Tenant
+        path: "tenant.zip"
