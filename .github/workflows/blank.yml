@@ -14,8 +14,8 @@ jobs:
     - name: Import Tenant
       env: 
         ClientId: b1ca132b-42c4-4b5e-be9a-e7e0169aaa1a
-        IdHostName: https://dev-id.loomesoftware.com
-        ApiHostName: https://dev-integrate-api.loomesoftware.com
+        IdHostName: dev-id.loomesoftware.com
+        ApiHostName: dev-integrate-api.loomesoftware.com
         AgentHostName: DESKTOP-7VCQDM7	
       shell: pwsh
       run: |
