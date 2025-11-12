@@ -13,7 +13,7 @@ jobs:
     - uses: actions/checkout@v4
     - name: Import Tenant
       env: 
-        ClientId: b1ca132b-42c4-4b5e-be9a-e7e0169aaa1a
+        ClientId: b467f6f3-6a8c-4c16-bc3a-1e5e00b9770b
         IdHostName: dev-id.loomesoftware.com
         ApiHostName: dev-integrate-api.loomesoftware.com
         AgentHostName: DESKTOP-7VCQDM7	
