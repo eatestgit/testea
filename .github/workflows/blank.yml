@@ -59,6 +59,7 @@ jobs:
         }
         
         $ZipPath = "tenant.zip";
+        Get-ChildItem Env:
         Remove-Item $ZipPath -ErrorAction Ignore;
         Compress-Archive -Path $ArtifactOutputDir -DestinationPath $ZipPath;
         Upload-Zip -ZipLocation $ZipPath;
